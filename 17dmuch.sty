@@ -1,0 +1,296 @@
+\NeedsTeXFormat{pLaTeX2e}
+\ProvidesPackage{17dmuch}
+  [2023/04/17 v0.1 Journal of Disaster Mitigation for Historical Cities]
+
+\RequirePackage{newtxtext}
+% \RequirePackage{newtxmath}
+\RequirePackage{geometry}
+\RequirePackage[singlespacing]{setspace}
+\RequirePackage{amsmath}
+\RequirePackage{overcite}
+\RequirePackage[labelsep=quad,font=normal]{caption}
+\RequirePackage{subcaption}
+\RequirePackage{newfloat}
+\RequirePackage[T1]{fontenc}
+
+\newif\ifronbun\ronbuntrue
+\newif\ifreport\reportfalse
+\DeclareOption{ronbun}{\ronbuntrue\reportfalse}
+\DeclareOption{report}{\ronbunfalse\reporttrue}
+\ProcessOptions
+
+%% photo and subphoto environment
+\DeclareFloatingEnvironment[name={写真}]{photo}
+\DeclareCaptionSubType[alph]{photo}
+\captionsetup[subphoto]{labelformat=simple}
+\renewcommand{\thesubphoto}{(\alph{subphoto})}
+
+%% caption setup
+\captionsetup{
+  labelsep=quad,
+  skip=3pt,
+  font=normal}
+\captionsetup[table]{position=top}
+
+%% subcaption is normalsize
+\subcaptionsetup{
+  font=normal,
+  margin=0pt,
+  labelsep=space,
+  skip=3pt
+}
+
+% 歴史都市防災シンポジウム用ヘッダ (毎年変更する)
+\newcommand{\@volume}{17}
+\newcommand{\@heldon}{2023年7月}
+\newcommand{\@proceedingstitleandvolume}{歴史都市防災論文集 Vol.\,\,\@volume{}\quad{}(\@heldon{})}
+\newcommand{\@paperorreport}{
+  \ifronbun 【論文】\fi
+  \ifreport 【報告】\fi}
+
+% ページ設定
+\geometry{
+  scale=1.0,
+  layoutoffset=0pt,
+  top=20truemm,
+  bottom=25truemm,
+  left=20truemm,
+  right=20truemm,
+  includefoot=true
+}
+
+\setlength{\textwidth}{170mm}
+\setlength{\textheight}{252mm}
+\setlength{\marginparsep}{0pt}
+\setlength{\marginparwidth}{0pt}
+\setlength{\baselineskip}{13pt}
+
+\setlength{\parindent}{1zw}
+
+\renewcommand{\small}{\jsc@setfontsize\small\@ixpt{11}}
+\renewcommand{\large}{\jsc@setfontsize\large\@xipt{\n@baseline}}
+\renewcommand{\Large}{\jsc@setfontsize\Large\@xiipt{\n@baseline}}
+\renewcommand{\LARGE}{\jsc@setfontsize\LARGE\@xviipt{\n@baseline}}
+
+% キャプション間を少し詰める
+\setlength\abovecaptionskip{1pt}
+% \setlength\belowcaptionskip{1pt}
+% \long\def\@makecaption#1#2{{%
+%   \vskip\abovecaptionskip
+%   \sbox\@tempboxa{#1\hskip1zw\relax #2}%
+%   \ifdim \wd\@tempboxa <\hsize \centering \fi
+%   #1{\hskip1zw\relax}#2\par
+%   \vskip\belowcaptionskip}}
+% \newcommand{\figcaption}[1]{\def\@captype{figure}\caption{#1}}
+% \newcommand{\phocaption}[1]{\def\@captype{photo}\caption{#1}}
+
+%figure&table
+\setlength\textfloatsep{1zw}
+\setlength\floatsep{1zw}
+\setlength\intextsep{1zw}
+
+%セクション
+\renewcommand{\section}{\@startsection{section}{1}{\z@}% \z@=0
+  {\Cvs}% \Cvs=\baselineskip 上を1行以上空ける
+  {0.7\Cvs} % 下を1行空ける
+  {\reset@font\fontsize{11truept}{13.6}\bfseries}} % ゴシックで
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
+  {\Cvs}% 上を1行程度空ける
+  {.1\p@\vspace{0zw}}%
+  {\reset@font\fontsize{10truept}{10pt}\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{\z@}%
+  {0.1\Cvs}% 上下にスペースは不要
+  {.1\p@\vspace{0zw}}%
+  {\reset@font\normalsize\bfseries}}
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
+  {0.5\Cvs \@plus.5\Cdp \@minus.2\Cdp}%
+  {\if@slide .5\Cvs \@plus.3\Cdp \else -1zw\fi}% 改行せず 1zw のアキ
+  {\pmb\normalfont\normalsize\headfont\jsParagraphMark}}
+\renewcommand{\jsParagraphMark}{}
+\def\@arabicz#1{%
+  \ifcase#1 ０\or １\or ２\or ３\or ４\or ５\or ６\or ７\or ８\or ９\or １０\or
+    １１\or １２\or １３\or １４\or １５\or １６\or １７\or １８\or １９\or ２０\or 
+    ２１\or ２２\or ２３\or ２４\or ２５\or ２６\else\@ctrerr\fi}
+\def\arabicz#1{\expandafter\@arabicz\csname c@#1\endcsname}%１２３ 全角
+\renewcommand{\thesection}{\@arabicz\c@section．\hskip-1zw}
+\renewcommand{\thesubsection}{(\@arabic\c@subsection)}
+\renewcommand{\thesubsubsection}{\@alph\c@subsubsection)}
+
+%% 参考文献
+\renewcommand{\refname}{\pmb\normalsize\bfseries 参考文献}
+\def\@biblabel#1{#1)}   %List
+
+\renewenvironment{thebibliography}[1]{%
+  \global\let\presectionname\relax
+  \global\let\postsectionname\relax
+  \parindent=0pt
+  \subsection*{\refname}\@mkboth{\refname}{\refname}%
+  \list{\@biblabel{\@arabic\c@enumiv}}%
+  {\settowidth\labelwidth{\@biblabel{#1}}%
+    \leftmargin\labelwidth
+    \advance\leftmargin\labelsep
+    \@openbib@code
+    \usecounter{enumiv}%
+    \let\p@enumiv\@empty
+    \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+  \sloppy
+  \clubpenalty4000
+  \@clubpenalty\clubpenalty
+  \widowpenalty4000%
+  \sfcode`\.\@m}
+
+%% citation
+%% a little change from `overcite.sty'
+\renewcommand\citeform[1]{#1)} % parenthesis after numbers ^{1)-5),8)}
+%%% 本文中で文献を参照する場合は通常のフォントにする
+\DeclareRobustCommand\Ncite{%
+  \@ifnextchar [{\@tempswatrue\@normalcitex}{\@tempswafalse\@normalcitex[]}}
+\def\@normalcitex[#1]#2{%
+  \let\@Ncitea\@empty
+  \@Ncite{\@for\@Nciteb:=#2\do
+    {\@Ncitea\def\@Ncitea{,\penalty\@m\ }%
+      \edef\@Nciteb{\expandafter\@firstofone\@Nciteb}%
+      \if@filesw\immediate\write\@auxout{\string\citation{\@Nciteb}}\fi
+      \@ifundefined{b@\@Nciteb}{\mbox{\reset@font\bfseries ?}%
+        \G@refundefinedtrue
+        \@latex@warning
+        {Citation `\@Nciteb' on page \thepage \space undefined}}%
+      {\hbox{\csname b@\@Nciteb\endcsname}}}}{#1}}
+\def\@Ncite#1#2{#1\if@tempswa , #2\fi}
+
+%タイトル設定
+%%%
+% pagestyle is empty
+% \pagestyle{empty}
+
+% change definition of \thanks to make a box
+\newcounter{oldThanks}
+% \renewcommand{\thanks}[2]{
+%   % 中間ファイルがなければ作る
+%   \global\newwrite\@titlefile \gdef\@titlename{\jobname.dmuch }%
+%   % temporary file "\jobname.dmuch" is used to store all the \thanks'
+%   \immediate\openout\@titlefile\@titlename
+
+%   % 実行部
+%   \stepcounter{footnote}%
+%   \footnotemark[\arabic{footnote}]%
+%   {
+%     %\ifnum \the\value{footnote}>\the\value{oldThanks}
+%       \let\protect\string\immediate\write\@titlefile{
+%         % 番号 所属職位 (所属先住所)
+%         % 所属職位等英語表記
+%         % 1名につき2行、中央揃え
+%         \string\footnotemark[\arabic{footnote}]\space 
+%         #1\space\par
+%         #2\par} % 要修正
+%       \stepcounter{oldThanks}
+%     %\fi}%
+% }
+
+%
+% re-define \title
+%
+\newcommand{\jtitle}[1]{\gdef\j@title{#1}}
+\newcommand{\subjtitle}[1]{\gdef\subj@title{#1}}
+\newcommand{\etitle}[1]{\gdef\e@title{#1}}
+\newcommand{\subetitle}[1]{\gdef\sube@title{#1}}
+\newcommand{\j@title}{\@latex@error{No \noexpand\jtitle given}\@ehc}
+\newcommand{\subj@title}{\@latex@error{No \noexpamd\subjtitle given}\@ehc}
+\newcommand{\e@title}{\@latex@error{No \noexpand\etitle given}\@ehc}
+\newcommand{\sube@title}{\@latex@error{No \noexpand\subetitle given}\@ehc}
+%
+%
+% define \author
+\newcommand{\authorj}[1]{\gdef\@authorj{#1}}
+\newcommand{\authore}[1]{\gdef\@authore{#1}}
+\newcommand{\shozoku}[1]{\gdef\@shozoku{#1}}
+\newcommand{\@authorj}{\@latex@error{No \noexpand\authorj given}\@ehc}
+\newcommand{\@authore}{\@latex@error{No \noexpand\authore given}\@ehc}
+\newcommand{\@shozoku}{\@latex@error{No \noexpand\shozoku given}\@ehc}
+%
+% define \abstract
+%
+\renewcommand{\abstract}[1]{%
+  \gdef\@abstract{#1}}
+\newcommand{\@abstract}{\@latex@error{No \noexpand\abstract given}\@ehc}
+\newlength{\abstwidth}
+\setlength{\abstwidth}{\textwidth}
+\addtolength{\abstwidth}{-4zw}
+%
+% keywords
+%
+\def\keywords#1{\gdef\@keywords{#1}}\keywords{}
+
+%
+% set layout of the actual \@maketitle suitable for your need
+%
+
+\def\@maketitle{%
+  \newpage\null
+  \parindent=0pt
+  {\@proceedingstitleandvolume\hfill{}\@paperorreport}
+  \vspace{\baselineskip}\par
+  \begin{center}%
+    % \let\footnote\thanks
+
+% 日本語主題
+    \pmb{\LARGE\bf\j@title}\vspace{\baselineskip}\par
+    %
+    {\large\e@title}\vspace{\baselineskip}\par
+    %
+    {\large\@authorj}\par
+    %
+    {\large\@authore}\vspace{\baselineskip}\par
+    %
+    {\small\@shozoku}
+    % {\small\input{\jobname.dmuch}}
+  \end{center}%\vspace{\baselineskip}\par
+  %
+  {\@abstract}\vspace{\baselineskip}\par
+  %
+  {\textit{\textbf{Keywords:}\,\,\@keywords}}
+  \vspace{\baselineskip}\par
+  %%%
+}
+
+%%%%%
+% \maketitle の再定義
+%     abstract と Keywords を追加
+%     プリアンブルで、\jtitle, \etitle, \author, \abstract, \keywords
+%     を指定
+%
+\def\maketitle{\par
+  \begingroup
+  \def\thefootnote{{\arabic{footnote}}}%
+  \def\@makefnmark{\hbox
+    to\z@{$\m@th^{\@thefnmark}$\hss}}%
+  \@maketitle
+  % \thispagestyle{empty}%\@thanks
+  \endgroup
+%
+  \setcounter{footnote}{0}%
+  \global\let\thanks\relax
+  \global\let\maketitle\relax
+  \global\let\p@thanks\relax
+  \global\let\@thanks\@empty
+  \global\let\@author\@empty
+  \global\let\@date\@empty
+  \global\let\j@title\@empty
+  \global\let\e@title\@empty
+  \global\let\@ekeywords\@empty
+  \global\let\@jkeywords\@empty
+  \global\let\@abstract\@empty
+  \global\let\jtitle\relax
+  \global\let\etitle\relax
+  \global\let\ekeywords\relax
+  \global\let\jkeywords\relax
+  \global\let\abstract\relax
+  \global\let\author\relax
+  \global\let\date\relax
+  \global\let\and\relax
+}
+
+%%%% some tips
+\def\frac#1#2{{\begingroup\;#1\;\endgroup\@@over\;#2\;}}
+\newcommand{\dspfrac}[2]{\displaystyle\frac{#1}{#2}}
+\newcommand{\marusuuji}[1]{\raise0.2pt\hbox{\scalebox{1.1}{\textcircled{\tiny{#1}}}}}
